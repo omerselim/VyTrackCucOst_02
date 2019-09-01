@@ -1,0 +1,6 @@
+
+ BrowserUtils.waitForClickablility(rememberMeElement, Integer.valueOf(ConfigurationReader.getProperty("SHORT_WAIT")));
+ BrowserUtils.waitForClickablility(rememberMeElement, Integer.parseInt(ConfigurationReader.getProperty("SHORT_WAIT")));
+
+ ----------------------------------------------------------------------------------------------------------------------
+

@@ -1,0 +1,149 @@
+Today is 8/14/2019
+
+	Agenda:
+		Background
+		Cucumber HTML Report
+		json report
+		maven surefire plugin
+
+##########################
+		What is background in Cucumber?
+
+If you have test steps that are common for all scenarios within a feature file, we can move those steps into background.
+
+Background runs test steps before every scenario only in the particular feature file.
+	If hook runs before and after every scenario regardless where scenario located, background runs only for specific feature file.
+
+	For example:
+
+
+Background:
+ Given user is on the landing page
+
+	  @storemanager
+  Scenario: Login as a store manager
+    Then user logs in as a store manager
+    And user verifies that "Dashboard" page name is displayed
+
+  @negative
+  Scenario: Verify warning message for invalid credentials
+    Then user logs in with "wrong" username and "wrong" password
+    And user verifies that "Invalid user name or password." warning message is displayed
+
+  @driver
+  Scenario: Login as a driver
+    Then user logs in as a driver
+    And user verifies that "Quick Launchpad" page name is displayed
+
+Question: this is more beneficial when you have like 100 scenarios right?
+
+
+Background is essentially the first step to all scenarios in the particular feature file.
+
+
+For background - we don't create separate feature file.
+
+You can think of background as encapsulated common test steps.
+
+hook before -> scenario -> hook after
+##########################################
+if feature has a background
+
+hook before -> background -> scenario -> hook after
+Interview question: How do you run minor regression? How you can specify only certain features?
+
+#####How do you run only certain group of features?
+Let's say you have to run all automation scripts only for fleet.
+	-tags
+	Example:
+	In the runner class, I can specify path to the folder for fleet features only. Thus, I don't need to worry about tags. In this case, runner class will run all feature files that are under fleet folder.
+
+	  features = {"src/test/resources/features/fleet",
+                   //to specify where are the features
+        },
+
+ We don't change step definitions.
+
+ In this way I select tests that I need to run for minor regression.
+
+old version ~ ..updated not | to ignore certain scenarios or features.
+
+If  <version>4.8.0</version> doesn't work for you, change it to:
+
+ <version>4.4.0</version>
+
+ Don't forget about auto-import!!!
+
+
+Once you added plugin for report (complete build), run:
+mvn clean verify - from terminal
+
+In my project, we use Maven Cucumber Report to generate nice HTML report.
+
+<plugin>
+                <groupId>net.masterthought</groupId>
+                <artifactId>maven-cucumber-reporting</artifactId>
+                <version>4.8.0</version>
+                <executions>
+                    <execution>
+                        <id>execution</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <projectName>Cucumber HTML Reports</projectName>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <inputDirectory>${project.build.directory}</inputDirectory>
+                            <jsonFiles>
+                                <param>**/cucumber.json</param>
+                            </jsonFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+Don't forget that this report will require json file, specify it in the runner class.
+QUESTION:
+So when we run it through Jenkins, will it be available in Jenkins too?
+ - YES, also Jenkins has a plugin that can generate this report in the post-build stage.
+
+ Jenkins is a CI/CD tool, we will talk about this later.
+
+ #############################
+
+This line means that report has been generated. We need to execute maven goal verify in order to get this report. Otherwise, if you will run it from CukesRunner directly, it will not trigger a plugin that generates report.
+
+] --- maven-cucumber-reporting:4.8.0:generate (execution) @ OnlineSpring2019Cucumber ---
+
+In order to run specific scenarios from terminal, use following:
+
+mvn clean verify -Dcucumber.options="--tags @navigation"
+
+
+QUESIOTN:
+
+How Maven knows which CukesRunner class will run?
+
+	 <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <includes>
+                        <include>**/CukesRunner.java</include>
+                    </includes>
+                    <testFailureIgnore>true</testFailureIgnore>
+                </configuration>
+            </plugin>
+
+If you want to have couple builds you need to use profiles.
+
+Build lifecycle is a sequence of tasks that we use to build a software.
+
+
+From 2:30 till 3:30 short mentoring on testng framework EST
+
+
+
+
